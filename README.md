@@ -1,86 +1,143 @@
 # TP1 - ABM de Usuarios y Productos con FastAPI
 
 Proyecto para el Trabajo Práctico 1: ABM completo de usuarios y ABM de una
-entidad propia (Producto), usando **FastAPI** y **Pydantic**.
+entidad propia (Producto), usando FastAPI y Pydantic.
 
-## Crear el entorno virtual (venv)
+Este README explica paso a paso cómo ejecutar la aplicación en una máquina
+local (instrucciones explícitas para Windows y para macOS/Linux).
 
-Desde esta carpeta (`clase-fastapi`):
+---
+
+## Estructura
+
+La aplicación principal está dentro de la carpeta `clase-fastapi`.
+
+- `clase-fastapi/main.py` — punto de entrada (FastAPI app)
+- `clase-fastapi/routers/` — routers para usuarios y productos
+- `clase-fastapi/models/` — modelos Pydantic
+- `clase-fastapi/requirements.txt` — dependencias
+
+---
+
+## Requisitos previos
+
+- Python 3.8+ instalado (se probó con 3.13 en el entorno de desarrollo).
+- Recomendado: usar un virtualenv para instalar dependencias sin afectar
+  el sistema.
+
+---
+
+## Pasos para ejecutar (forma recomendada)
+
+Abrir una terminal y situarse en la carpeta raíz del proyecto, luego entrar
+en la carpeta de la aplicación:
 
 ```bash
-python -m venv .venv
+cd clase-fastapi
 ```
 
-Activar el entorno virtual:
+Crear y activar un virtualenv:
 
 ```bash
+# Crear (se crea la carpeta .venv dentro de clase-fastapi)
+python -m venv .venv
+
+# Activar (PowerShell)
+.venv\Scripts\Activate.ps1
+
+# O en CMD (Windows)
+.venv\Scripts\activate.bat
+
 # macOS / Linux
 source .venv/bin/activate
-
-# Windows (PowerShell)
-.venv\Scripts\Activate.ps1
 ```
 
-## Instalar los requerimientos
-
-Con el entorno virtual activado:
+Actualizar pip (opcional pero recomendado):
 
 ```bash
-pip install -r requirements.txt
+python -m pip install --upgrade pip
 ```
 
-## Ejecutar la aplicación
+Instalar dependencias:
 
 ```bash
+python -m pip install -r requirements.txt
+```
+
+Iniciar la aplicación con Uvicorn (comando recomendado):
+
+```bash
+python -m uvicorn main:app --host 127.0.0.1 --port 8000
+```
+
+- Para desarrollo con recarga automática, agregar `--reload`.
+- Si el equipo no tiene `uvicorn` instalado global, se usará el del
+  virtualenv (es lo recomendado).
+
+Alternativa (si está disponible):
+
+```bash
+# si tienen instalado fastapi-cli
 fastapi dev main.py
 ```
 
-La API quedará disponible en `http://127.0.0.1:8000` y la documentación
-interactiva (Swagger) en `http://127.0.0.1:8000/docs`, donde se pueden
-probar todos los endpoints.
+---
 
-## Endpoints disponibles
+## URLs útiles
 
-### Usuarios (`/user`)
+- API: http://127.0.0.1:8000
+- Swagger / OpenAPI (interactivo): http://127.0.0.1:8000/docs
+- Esquema OpenAPI JSON: http://127.0.0.1:8000/openapi.json
 
-| Método | Ruta | Descripción |
-|---|---|---|
-| GET | `/user` | Lista usuarios. Acepta filtro opcional `?is_active=true/false` |
-| POST | `/user` | Crea un usuario |
-| PUT | `/user/{id}` | Modifica un usuario existente |
-| DELETE | `/user/{id}` | Elimina un usuario |
+---
 
-### Productos (`/producto`)
+## Endpoints disponibles (resumen)
 
-| Método | Ruta | Descripción |
-|---|---|---|
-| GET | `/producto` | Lista productos. Acepta filtro opcional `?categoria=Tecnología` |
-| GET | `/producto/{id}` | Obtiene un producto por id |
-| POST | `/producto` | Crea un producto |
-| PUT | `/producto/{id}` | Modifica un producto existente |
-| DELETE | `/producto/{id}` | Elimina un producto |
+Usuarios (`/user`):
 
-Los datos se almacenan en memoria (se pierden al reiniciar el servidor).
-Ambas entidades vienen con algunos registros de ejemplo cargados al
-arrancar la aplicación, para poder probar los endpoints sin necesidad de
-crear datos primero.
+- GET /user — lista usuarios (opcional: `?is_active=true/false`)
+- POST /user — crea un usuario
+- PUT /user/{id} — actualiza un usuario
+- DELETE /user/{id} — elimina un usuario
 
-## Lint y chequeo de tipos
+Productos (`/producto`):
 
-El proyecto incluye configuración local para dos herramientas:
+- GET /producto — lista productos (opcional: `?categoria=<nombre>`)
+- GET /producto/{id} — obtiene producto por id
+- POST /producto — crea un producto
+- PUT /producto/{id} — actualiza un producto
+- DELETE /producto/{id} — elimina un producto
 
-- **[`setup.cfg`](./setup.cfg)**: configuración de [`pycodestyle`](https://pycodestyle.pycqa.org/) (chequeo de estilo PEP 8). Define `max-line-length = 79` y excluye `.venv` y `__pycache__` del análisis.
-- **[`pyrightconfig.json`](./pyrightconfig.json)**: configuración de [`pyright`](https://microsoft.github.io/pyright/) (chequeo de tipos). Apunta al entorno virtual local (`.venv`) para resolver las dependencias instaladas y excluye `.venv` y `__pycache__`.
+Nota: los datos se almacenan en memoria (no hay persistencia). Al reiniciar
+el servidor se pierden los cambios. Hay datos de ejemplo cargados al iniciar
+la app para facilitar las pruebas.
 
-`pyright` ya está incluido en `requirements.txt`. `pycodestyle` no, así que hay que instalarlo aparte.
+---
 
-Con el entorno virtual activado, correr:
+## Lint y chequeo de tipos (opcional)
+
+El repositorio incluye:
+
+- `setup.cfg` — configuración para pycodestyle (PEP 8)
+- `pyrightconfig.json` — configuración para pyright (chequeo de tipos)
+
+Comandos sugeridos (con el virtualenv activado):
 
 ```bash
-pip install pycodestyle
+python -m pip install pycodestyle
 python -m pycodestyle .
-```
 
-```bash
+# pyright (ya se incluye en requirements.txt)
 pyright
 ```
+
+---
+
+## Solución de problemas comunes
+
+- "Address already in use" al iniciar uvicorn: el puerto 8000 ya está ocupado.
+  Usar otro puerto, por ejemplo `--port 8001`.
+- Error de import cuando se ejecuta `main:app`: asegurarse de estar en la
+  carpeta `clase-fastapi` antes de ejecutar uvicorn.
+- Si faltan paquetes, volver a ejecutar `python -m pip install -r
+  requirements.txt` dentro del virtualenv.
