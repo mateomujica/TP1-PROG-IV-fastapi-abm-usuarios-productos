@@ -130,14 +130,3 @@ python -m pycodestyle .
 # pyright (ya se incluye en requirements.txt)
 pyright
 ```
-
----
-
-## Solución de problemas comunes
-
-- "Address already in use" al iniciar uvicorn: el puerto 8000 ya está ocupado.
-  Usar otro puerto, por ejemplo `--port 8001`.
-- Error de import cuando se ejecuta `main:app`: asegurarse de estar en la
-  carpeta `clase-fastapi` antes de ejecutar uvicorn.
-- Si faltan paquetes, volver a ejecutar `python -m pip install -r
-  requirements.txt` dentro del virtualenv.
